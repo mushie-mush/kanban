@@ -4,12 +4,11 @@ from rest_framework.routers import DefaultRouter
 from . import views
 
 router = DefaultRouter()
-router.register(r'boards', views.BoardViewSet)
-router.register(r'columns', views.ColumnViewSet)
-router.register(r'cards', views.CardViewSet)
+router.register('boards', views.BoardViewSet)
+router.register('columns', views.ColumnViewSet)
+router.register('cards', views.CardViewSet)
 
 urlpatterns = [
-    path('', views.index, name='index'),
     path('', include(router.urls)),
 ]
 

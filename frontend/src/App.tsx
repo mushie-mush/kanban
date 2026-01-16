@@ -1,14 +1,14 @@
-import { Theme } from '@radix-ui/themes';
 import BoardPage from './pages/BoardPage';
 import Layout from './components/layout/Layout';
+import { ThemeProvider } from './components/ThemeProvider';
 
 function App() {
   return (
-    <Theme>
+    <ThemeProvider defaultTheme="system">
       <Layout>
         <BoardPage />
       </Layout>
-    </Theme>
+    </ThemeProvider>
   );
 }
 

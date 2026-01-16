@@ -22,9 +22,6 @@ from .serializer import BoardSerializer, ColumnSerializer, CardSerializer
 
 
 # Create your views here.
-def index(request):
-    return JsonResponse({"message": "API is working"})
-
 class BoardViewSet(viewsets.ModelViewSet):
     queryset = Board.objects.all()
     serializer_class = BoardSerializer
