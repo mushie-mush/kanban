@@ -19,3 +19,8 @@ class BoardSerializer(serializers.ModelSerializer):
     class Meta:
         model = Board
         fields = '__all__'
+
+class BoardListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Board
+        fields = ['board_id', 'board_name']

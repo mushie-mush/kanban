@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from .models import Board, Column, Card
-from .serializer import BoardSerializer, ColumnSerializer, CardSerializer
+from .serializer import BoardListSerializer, BoardSerializer, ColumnSerializer, CardSerializer
 
 
 # TODO: Replace these with actual IDs from boards and columns tables
@@ -22,9 +22,9 @@ from .serializer import BoardSerializer, ColumnSerializer, CardSerializer
 
 
 # Create your views here.
-class BoardViewSet(viewsets.ModelViewSet):
-    queryset = Board.objects.all()
-    serializer_class = BoardSerializer
+# class BoardViewSet(viewsets.ModelViewSet):
+#     queryset = Board.objects.all()
+#     serializer_class = BoardSerializer
 
 class ColumnViewSet(viewsets.ModelViewSet):
     queryset = Column.objects.all()
@@ -34,20 +34,26 @@ class CardViewSet(viewsets.ModelViewSet):
     queryset = Card.objects.all()
     serializer_class = CardSerializer
 
-# class BoardDetail(APIView):
-#     def get(self, request, board_id):
-#         board = Board.objects.get(board_id=board_id)
-#         serializer = BoardSerializer(board)
+class BoardDetail(APIView):
+    def get(self, request, board_id):
+        board = Board.objects.get(board_id=board_id)
+        serializer = BoardSerializer(board)
 
-#         return JsonResponse({"message": "Board endpoint", "payload": serializer.data})
+        return Response(serializer.data)
 
-# class BoardList(APIView):
-#     def post(self, request):
-#         serializer = BoardSerializer(data=request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data, status=status.HTTP_201_CREATED)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class BoardList(APIView):
+    def get(self, request):
+        boards = Board.objects.all()
+        serializer = BoardListSerializer(boards, many=True)
+
+        return Response(serializer.data)
+    
+    def post(self, request):
+        serializer = BoardListSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # class ColumnDetail(APIView):
 #     def get(self, request, column_id):
