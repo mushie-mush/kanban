@@ -27,8 +27,6 @@ services:
       - DATABASE_PORT=${DATABASE_PORT}
     ports:
       - '8000:8000'
-    depends_on:
-      - db
     volumes:
       - ./backend:/app
 
@@ -36,7 +34,6 @@ services:
     build: ./frontend
     ports:
       - '5173:5173'
-    depends_on:
-      - backend
     volumes:
       - ./frontend:/app
+      - /app/node_modules
