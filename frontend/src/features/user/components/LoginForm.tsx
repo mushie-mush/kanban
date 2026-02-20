@@ -5,7 +5,10 @@ import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { AlertCircleIcon } from 'lucide-react';
 import { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router';
+import { login } from './authSlice';
+import { getCsrfToken } from '@/lib/csrf';
 
 function LoginForm() {
   const [username, setUsername] = useState('');
@@ -14,23 +17,30 @@ function LoginForm() {
   const [error, setError] = useState(false);
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-
     setLoading(true);
     setError(false);
+
+    const csrfToken = await getCsrfToken();
+
     const response = await fetch('http://localhost:8000/api/login/', {
       method: 'POST',
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
+        'X-CSRFToken': csrfToken,
       },
       body: JSON.stringify({ username, password }),
     });
 
     if (response.ok) {
       const data = await response.json();
-      navigate('/dashboard', { state: { user: data } });
+
+      dispatch(login(data));
+      navigate('/app');
     } else {
       setError(true);
     }

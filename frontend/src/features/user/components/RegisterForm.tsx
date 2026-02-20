@@ -1,9 +1,14 @@
 import { Button } from '@/components/ui/button';
-import { Field, FieldDescription, FieldLabel } from '@/components/ui/field';
+import { Field, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router';
+import { login } from './authSlice';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { AlertCircleIcon } from 'lucide-react';
+import { getCsrfToken } from '@/lib/csrf';
 
 function RegisterForm() {
   const [email, setEmail] = useState('');
@@ -13,22 +18,30 @@ function RegisterForm() {
   const [error, setError] = useState(false);
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-
     setLoading(true);
     setError(false);
+
+    const csrfToken = await getCsrfToken();
+
     const response = await fetch('http://localhost:8000/api/register/', {
       method: 'POST',
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
+        'X-CSRFToken': csrfToken,
       },
       body: JSON.stringify({ email, username, password }),
     });
 
     if (response.ok) {
-      navigate('/dashboard');
+      const data = await response.json();
+
+      dispatch(login(data));
+      navigate('/app');
     } else {
       setError(true);
     }
@@ -74,12 +87,18 @@ function RegisterForm() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           ></Input>
-          <FieldDescription className="text-right">
-            <Button variant="link" size="sm" type="button" disabled={loading}>
-              Forgot password?
-            </Button>
-          </FieldDescription>
         </Field>
+
+        {error && (
+          <Alert variant="destructive">
+            <AlertCircleIcon />
+            <AlertTitle>Registration failed</AlertTitle>
+            <AlertDescription>
+              Please check your credentials and try again.
+            </AlertDescription>
+          </Alert>
+        )}
+
         <Button type="submit" className="w-full" disabled={loading}>
           Sign Up
         </Button>
