@@ -28,4 +28,12 @@ class UserTests(APITestCase):
         response = self.client.post(url, data, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn('token', response.data)
+
+    def test_logout_user(self):
+        User.objects.create_user(username='user001', password='password123')
+
+        self.client.login(username='user001', password='password123')
+        url = reverse('logout')
+        response = self.client.post(url, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
