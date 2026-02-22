@@ -13,9 +13,8 @@ function Board() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
         <div>
           <h1 className="text-3xl font-bold">{board?.name}</h1>
-          <p className="text-muted-foreground mt-1">
-            This is the board page for board ID: {board?.id}. You can display
-            the board details and tasks here.
+          <p className="text-muted-foreground mt-2">
+            {board?.description || 'No description provided.'}
           </p>
         </div>
       </div>

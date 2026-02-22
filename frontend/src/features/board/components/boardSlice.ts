@@ -3,6 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 interface Board {
   id: string;
   name: string;
+  description: string;
   owner: string;
 }
 

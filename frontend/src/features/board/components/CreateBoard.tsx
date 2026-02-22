@@ -19,6 +19,7 @@ import { getCsrfToken } from '@/lib/csrf';
 
 function CreateBoardModal() {
   const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
   const [searchParams, setSearchParams] = useSearchParams();
   const dispatch = useDispatch();
 
@@ -42,7 +43,7 @@ function CreateBoardModal() {
         'Content-Type': 'application/json',
         'X-CSRFToken': csrfToken,
       },
-      body: JSON.stringify({ name }),
+      body: JSON.stringify({ name, description }),
     });
     const data = await response.json();
 
@@ -75,6 +76,17 @@ function CreateBoardModal() {
                 name="board-name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+              />
+            </Field>
+          </FieldGroup>
+          <FieldGroup>
+            <Field>
+              <Label htmlFor="board-description">Description</Label>
+              <Input
+                id="board-description"
+                name="board-description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
               />
             </Field>
           </FieldGroup>

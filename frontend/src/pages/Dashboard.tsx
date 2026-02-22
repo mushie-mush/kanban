@@ -18,7 +18,7 @@ function Dashboard() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
         <div>
           <h1 className="text-3xl font-bold">Dashboard</h1>
-          <p className="text-muted-foreground mt-1">
+          <p className="text-muted-foreground mt-2">
             Welcome back! Here's an overview of your boards and tasks.
           </p>
         </div>

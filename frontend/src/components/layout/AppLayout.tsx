@@ -35,7 +35,7 @@ function AppLayout() {
     }
 
     fetchBoards();
-  }, []);
+  }, [dispatch]);
 
   return (
     <SidebarProvider>
