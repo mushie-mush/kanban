@@ -7,7 +7,8 @@ from django.contrib.auth import authenticate, login, logout
 from django.middleware.csrf import get_token
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
-from .serializers import UserSerializer
+from .serializers import BoardSerializer, UserSerializer
+from .models import Board
 
 class UserCreateView(generics.CreateAPIView):
     serializer_class = UserSerializer
@@ -41,3 +42,26 @@ class UserDetailView(generics.RetrieveAPIView):
     
 def csrf_token_view(request):
     return JsonResponse({'csrfToken': get_token(request)})
+
+class BoardListView(views.APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        boards = Board.objects.filter(owner=request.user)
+        serializer = BoardSerializer(boards, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = BoardSerializer(data=request.data)
+
+        if serializer.is_valid():
+            serializer.save(owner=request.user)
+            return Response(serializer.data, status=201)
+        
+        return Response(serializer.errors, status=400)
+    
+    def delete(self, request):
+        board_id = request.data.get('id')
+        board = Board.objects.get(id=board_id, owner=request.user)
+        board.delete()
+        return Response({'message': 'Board deleted successfully'})
