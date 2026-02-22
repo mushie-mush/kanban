@@ -4,6 +4,7 @@ import Dashboard from './pages/Dashboard';
 import RegistrationPage from './pages/RegistrationPage';
 import ProtectedRoute from './pages/ProtectedRoute';
 import AppLayout from './components/layout/AppLayout';
+import Board from './pages/Board';
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         }
       >
         <Route path="" element={<Dashboard />} />
+        <Route path="board/:boardId" element={<Board />} />
       </Route>
     </Routes>
   );

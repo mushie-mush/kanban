@@ -1,4 +1,9 @@
-import { ChevronsUpDown, LogOutIcon, LucidePlus } from 'lucide-react';
+import {
+  ChevronsUpDown,
+  LogOutIcon,
+  LucidePlus,
+  SquareKanban,
+} from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,13 +19,14 @@ import {
   SidebarGroupAction,
   SidebarGroupContent,
   SidebarGroupLabel,
+  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
 } from '../ui/sidebar';
 import { Avatar, AvatarFallback } from '../ui/avatar';
 import { getCsrfToken } from '@/lib/csrf';
-import { useNavigate, useSearchParams } from 'react-router';
+import { Link, useNavigate, useSearchParams } from 'react-router';
 import { useSelector } from 'react-redux';
 import type { RootState } from '@/store';
 
@@ -49,10 +55,20 @@ function AppSidebar() {
     setSearchParams({ 'create-board': 'open' });
   }
 
-  console.log(myBoards);
-
   return (
     <Sidebar variant="inset">
+      <SidebarHeader>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton className="py-5" asChild>
+              <Link to="/app">
+                <SquareKanban className="size-6!" />
+                <span className="ml-1 text-lg font-bold">Kanban</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>My Boards</SidebarGroupLabel>
@@ -66,7 +82,9 @@ function AppSidebar() {
             ) : (
               myBoards.map((board) => (
                 <SidebarMenuItem key={board.id}>
-                  <SidebarMenuButton>{board.name}</SidebarMenuButton>
+                  <SidebarMenuButton asChild>
+                    <Link to={`/app/board/${board.id}`}>{board.name}</Link>
+                  </SidebarMenuButton>
                 </SidebarMenuItem>
               ))
             )}
