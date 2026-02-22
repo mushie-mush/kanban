@@ -1,4 +1,4 @@
-import { ChevronsUpDown, LogOutIcon } from 'lucide-react';
+import { ChevronsUpDown, LogOutIcon, LucidePlus } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,6 +11,7 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
+  SidebarGroupAction,
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarMenu,
@@ -19,10 +20,14 @@ import {
 } from '../ui/sidebar';
 import { Avatar, AvatarFallback } from '../ui/avatar';
 import { getCsrfToken } from '@/lib/csrf';
-import { useNavigate } from 'react-router';
+import { useNavigate, useSearchParams } from 'react-router';
+import { useSelector } from 'react-redux';
+import type { RootState } from '@/store';
 
 function AppSidebar() {
   const navigate = useNavigate();
+  const [, setSearchParams] = useSearchParams();
+  const myBoards = useSelector((state: RootState) => state.boards.boards);
 
   async function handleLogout() {
     const csrfToken = await getCsrfToken();
@@ -40,17 +45,34 @@ function AppSidebar() {
     }
   }
 
+  function openCreateBoardModal() {
+    setSearchParams({ 'create-board': 'open' });
+  }
+
+  console.log(myBoards);
+
   return (
     <Sidebar variant="inset">
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>My Boards</SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarGroupLabel>
-              <p className="text-md text-muted-foreground">
-                You don't have any boards yet.
-              </p>
-            </SidebarGroupLabel>
+            {myBoards.length === 0 ? (
+              <SidebarGroupLabel>
+                <p className="text-md text-muted-foreground">
+                  You don't have any boards yet.
+                </p>
+              </SidebarGroupLabel>
+            ) : (
+              myBoards.map((board) => (
+                <SidebarMenuItem key={board.id}>
+                  <SidebarMenuButton>{board.name}</SidebarMenuButton>
+                </SidebarMenuItem>
+              ))
+            )}
+            <SidebarGroupAction onClick={openCreateBoardModal}>
+              <LucidePlus />
+            </SidebarGroupAction>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
