@@ -21,5 +21,5 @@ class UserSerializer(serializers.ModelSerializer):
 class BoardSerializer(serializers.ModelSerializer):
     class Meta:
         model = Board
-        fields = ['id', 'name', 'owner']
+        fields = ['id', 'name', 'description', 'owner']
         read_only_fields = ['id', 'owner']
