@@ -9,7 +9,6 @@ interface IColumn {
   id: string;
   title: string;
   description?: string;
-  tasks?: ITask[];
   boardId: string;
 }
 
