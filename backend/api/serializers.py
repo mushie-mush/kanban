@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Board
+from .models import Board, Column
 
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
@@ -23,3 +23,9 @@ class BoardSerializer(serializers.ModelSerializer):
         model = Board
         fields = ['id', 'name', 'description', 'owner']
         read_only_fields = ['id', 'owner']
+
+class ColumnSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Column
+        fields = ['id', 'title', 'description', 'board']
+        read_only_fields = ['id', 'board']
