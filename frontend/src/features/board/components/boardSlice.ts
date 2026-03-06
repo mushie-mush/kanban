@@ -1,17 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit';
+import type { IBoard } from '../board.d';
 
-interface Board {
-  id: string;
-  name: string;
-  description: string;
-  owner: string;
+interface IBoardState {
+  boards: IBoard[];
 }
 
-interface BoardState {
-  boards: Board[];
-}
-
-const initialState: BoardState = {
+const initialState: IBoardState = {
   boards: [],
 };
 
