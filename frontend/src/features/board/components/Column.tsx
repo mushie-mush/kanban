@@ -23,6 +23,9 @@ import type { RootState } from '@/store';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import { loadTasks } from './taskSlice';
+import { getCsrfToken } from '@/lib/csrf';
+import { useParams } from 'react-router';
+import { deleteColumn } from './columnSlice';
 
 const TaskData = [
   {
@@ -40,6 +43,7 @@ const TaskData = [
 ];
 
 function Column({ id, title, description }: IColumn) {
+  const { boardId } = useParams();
   const tasks = useSelector(
     (state: RootState) => state.tasks.tasksByColumnID[id] || [],
   );
@@ -62,6 +66,29 @@ function Column({ id, title, description }: IColumn) {
     }
   }, [dispatch, id, columnTasks.length]);
 
+  async function handleDeleteColumn() {
+    const csrfToken = await getCsrfToken();
+
+    const response = await fetch(
+      `http://localhost:8000/api/boards/${boardId}/columns/${id}/`,
+      {
+        method: 'DELETE',
+        credentials: 'include',
+        headers: {
+          'X-CSRFToken': csrfToken,
+        },
+      },
+    );
+
+    if (!response.ok) {
+      console.error('Failed to delete column');
+
+      return;
+    }
+
+    dispatch(deleteColumn({ boardId: boardId!, columnId: id }));
+  }
+
   return (
     <Card className="w-85" size="sm">
       <CardHeader>
@@ -78,7 +105,10 @@ function Column({ id, title, description }: IColumn) {
               <DropdownMenuGroup>
                 <DropdownMenuLabel>Column</DropdownMenuLabel>
                 <DropdownMenuItem>Edit details</DropdownMenuItem>
-                <DropdownMenuItem variant="destructive">
+                <DropdownMenuItem
+                  variant="destructive"
+                  onClick={handleDeleteColumn}
+                >
                   Delete
                 </DropdownMenuItem>
               </DropdownMenuGroup>

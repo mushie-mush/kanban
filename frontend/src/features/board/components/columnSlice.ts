@@ -24,9 +24,17 @@ export const columnSlice = createSlice({
       const { boardId, columns } = action.payload;
       state.columnsByBoardID[boardId] = columns;
     },
+    deleteColumn: (state, action) => {
+      const { boardId, columnId } = action.payload;
+      if (state.columnsByBoardID[boardId]) {
+        state.columnsByBoardID[boardId] = state.columnsByBoardID[
+          boardId
+        ].filter((column) => column.id !== columnId);
+      }
+    },
   },
 });
 
-export const { addColumn, loadColumns } = columnSlice.actions;
+export const { addColumn, loadColumns, deleteColumn } = columnSlice.actions;
 
 export default columnSlice.reducer;
