@@ -43,7 +43,7 @@ function Column({ id, title, description }: IColumn) {
   const tasks = useSelector(
     (state: RootState) => state.tasks.tasksByColumnID[id] || [],
   );
-  const columnTasks = tasks.filter((task) => task.columnId === id);
+  const columnTasks = tasks.filter((task) => task.column === id);
 
   const dispatch = useDispatch();
 
@@ -87,8 +87,8 @@ function Column({ id, title, description }: IColumn) {
         </CardAction>
       </CardHeader>
       <CardContent className="flex flex-col gap-2">
-        {columnTasks?.map((task, index) => (
-          <Task key={index} {...task} />
+        {columnTasks?.map((task) => (
+          <Task key={task.id} {...task} />
         ))}
       </CardContent>
       <CardFooter>

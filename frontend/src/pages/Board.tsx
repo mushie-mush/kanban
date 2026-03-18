@@ -1,47 +1,17 @@
 import { Button } from '@/components/ui/button';
 import Column from '@/features/board/components/Column';
 import { loadColumns } from '@/features/board/components/columnSlice';
+import CreateColumn from '@/features/board/components/CreateColumn';
+import { getCsrfToken } from '@/lib/csrf';
 import type { RootState } from '@/store';
 import { LucidePlus } from 'lucide-react';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useParams } from 'react-router';
-
-const ColumnData = [
-  {
-    id: 'col1',
-    title: 'To Do',
-    description: 'Tasks to be completed',
-    boardId: '1',
-  },
-  {
-    id: 'col2',
-    title: 'In Progress',
-    description: 'Tasks currently being worked on',
-    boardId: '1',
-  },
-  {
-    id: 'col3',
-    title: 'Done',
-    description: 'Completed tasks',
-    boardId: '1',
-  },
-  {
-    id: 'col4',
-    title: 'Backlog',
-    description: 'Tasks that are not yet prioritized',
-    boardId: '2',
-  },
-  {
-    id: 'col5',
-    title: 'Sprint',
-    description: 'Tasks planned for the current sprint',
-    boardId: '2',
-  },
-];
+import { useParams, useSearchParams } from 'react-router';
 
 function Board() {
   const { boardId } = useParams();
+  const [, setSearchParams] = useSearchParams();
   const dispatch = useDispatch();
 
   const boards = useSelector((state: RootState) => state.boards.boards);
@@ -58,9 +28,28 @@ function Board() {
     if (boardColumns.length === 0) {
       async function fetchColumns() {
         try {
-          const data = ColumnData.filter(
-            (column) => column.boardId === boardId,
+          const csrfToken = await getCsrfToken();
+
+          const response = await fetch(
+            `http://localhost:8000/api/boards/${boardId}/columns/`,
+            {
+              method: 'GET',
+              credentials: 'include',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken,
+              },
+            },
           );
+          const data = await response.json();
+
+          if (!response.ok) {
+            console.error('Failed to fetch columns:', data);
+            return;
+          }
+
+          console.log('Fetched columns:', data);
+
           dispatch(loadColumns({ boardId, columns: data }));
         } catch (error) {
           console.error('Error fetching columns:', error);
@@ -70,6 +59,10 @@ function Board() {
       fetchColumns();
     }
   }, [boardId, board, boardColumns.length, dispatch]);
+
+  function openCreateColumnModal() {
+    setSearchParams({ 'create-column': 'open' });
+  }
 
   return (
     <div className="p-6">
@@ -83,13 +76,15 @@ function Board() {
       </div>
 
       <div className="flex gap-4 mt-8">
-        {boardColumns.map((column, index) => (
-          <Column key={index} {...column} />
+        {boardColumns.map((column) => (
+          <Column key={column.id} {...column} />
         ))}
-        <Button variant="outline" className="">
+        <Button variant="outline" className="" onClick={openCreateColumnModal}>
           <LucidePlus />
         </Button>
       </div>
+
+      <CreateColumn />
     </div>
   );
 }
