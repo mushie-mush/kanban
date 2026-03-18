@@ -94,3 +94,13 @@ class ColumnDetailView(views.APIView):
         column = Column.objects.get(id=column_id, board__id=board_id, board__owner=request.user)
         column.delete()
         return Response({'message': 'Column deleted successfully'})
+
+    def patch(self, request, board_id, column_id):
+        column = Column.objects.get(id=column_id, board__id=board_id, board__owner=request.user)
+        serializer = ColumnSerializer(column, data=request.data, partial=True)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        
+        return Response(serializer.errors, status=400)

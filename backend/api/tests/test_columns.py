@@ -35,3 +35,15 @@ class ColumnTests(APITestCase):
         column_url = reverse('column-detail', kwargs={'board_id': board.id, 'column_id': column.id})
         delete_response = self.client.delete(column_url)
         self.assertEqual(delete_response.status_code, status.HTTP_200_OK)
+
+    def test_update_column(self):
+        board = Board.objects.create(name='Test Board', description='A board for testing', owner=self.user)
+        column = Column.objects.create(title='Test Column', description='A column for testing', board=board)
+
+        column_url = reverse('column-detail', kwargs={'board_id': board.id, 'column_id': column.id})
+        update_data = {
+            'title': 'Updated Column Title',
+            'description': 'Updated description'
+        }
+        update_response = self.client.patch(column_url, update_data, format='json')
+        self.assertEqual(update_response.status_code, status.HTTP_200_OK)
