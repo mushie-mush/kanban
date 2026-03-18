@@ -86,3 +86,11 @@ class ColumnListView(views.APIView):
         columns = Column.objects.filter(board=board)
         serializer = ColumnSerializer(columns, many=True)
         return Response(serializer.data)
+
+class ColumnDetailView(views.APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, board_id, column_id):
+        column = Column.objects.get(id=column_id, board__id=board_id, board__owner=request.user)
+        column.delete()
+        return Response({'message': 'Column deleted successfully'})

@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import BoardListView, ColumnListView, UserCreateView, UserDetailView, UserLoginView, UserLogoutView, csrf_token_view
+from .views import BoardListView, ColumnListView, ColumnDetailView, UserCreateView, UserDetailView, UserLoginView, UserLogoutView, csrf_token_view
 
 urlpatterns = [
     path('register/', UserCreateView.as_view(), name='register'),
@@ -8,5 +8,6 @@ urlpatterns = [
     path('user/', UserDetailView.as_view(), name='user'),
     path('csrf/', csrf_token_view, name='csrf'),
     path('boards/', BoardListView.as_view(), name='boards'),
-    path('boards/<int:board_id>/columns/', ColumnListView.as_view(), name='columns')
+    path('boards/<int:board_id>/columns/', ColumnListView.as_view(), name='columns'),
+    path('boards/<int:board_id>/columns/<int:column_id>/', ColumnDetailView.as_view(), name='column-detail'),
 ]
