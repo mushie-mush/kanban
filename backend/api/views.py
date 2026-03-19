@@ -8,8 +8,8 @@ from django.contrib.auth import authenticate, login, logout
 from django.middleware.csrf import get_token
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
-from .serializers import BoardSerializer, ColumnSerializer, UserSerializer
-from .models import Board, Column
+from .serializers import BoardSerializer, ColumnSerializer, TaskSerializer, UserSerializer
+from .models import Board, Column, Task
 
 class UserCreateView(generics.CreateAPIView):
     serializer_class = UserSerializer
@@ -104,3 +104,31 @@ class ColumnDetailView(views.APIView):
             return Response(serializer.data)
         
         return Response(serializer.errors, status=400)
+
+class TaskListView(views.APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, board_id, column_id):
+        column = get_object_or_404(Column, id=column_id, board__id=board_id, board__owner=request.user)
+
+        serializer = TaskSerializer(data=request.data)
+
+        if serializer.is_valid():
+            serializer.save(column=column)
+            return Response(serializer.data, status=201)
+        
+        return Response(serializer.errors, status=400)
+    
+    def get(self, request, board_id, column_id):
+        column = get_object_or_404(Column, id=column_id, board__id=board_id, board__owner=request.user)
+        tasks = Task.objects.filter(column=column)
+        serializer = TaskSerializer(tasks, many=True)
+        return Response(serializer.data)
+
+class TaskDetailView(views.APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, board_id, column_id, task_id):
+        task = Task.objects.get(id=task_id, column__id=column_id, column__board__id=board_id, column__board__owner=request.user)
+        task.delete()
+        return Response({'message': 'Task deleted successfully'})

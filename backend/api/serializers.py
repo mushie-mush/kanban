@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Board, Column
+from .models import Board, Column, Task
 
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
@@ -29,3 +29,9 @@ class ColumnSerializer(serializers.ModelSerializer):
         model = Column
         fields = ['id', 'title', 'description', 'board']
         read_only_fields = ['id', 'board']
+
+class TaskSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Task
+        fields = ['id', 'title', 'description', 'column']
+        read_only_fields = ['id', 'column']
