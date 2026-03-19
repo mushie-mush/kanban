@@ -24,23 +24,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import { loadTasks } from './taskSlice';
 import { getCsrfToken } from '@/lib/csrf';
-import { useParams } from 'react-router';
+import { useParams, useSearchParams } from 'react-router';
 import { deleteColumn } from './columnSlice';
-
-const TaskData = [
-  {
-    id: 'task1',
-    title: 'Example Task 1',
-    description: 'This is an example task',
-    columnId: 'col1',
-  },
-  {
-    id: 'task2',
-    title: 'Example Task 2',
-    description: 'This is another example task',
-    columnId: 'col1',
-  },
-];
 
 function Column({ id, title, description }: IColumn) {
   const { boardId } = useParams();
@@ -48,6 +33,7 @@ function Column({ id, title, description }: IColumn) {
     (state: RootState) => state.tasks.tasksByColumnID[id] || [],
   );
   const columnTasks = tasks.filter((task) => task.column === id);
+  const [, setSearchParams] = useSearchParams();
 
   const dispatch = useDispatch();
 
@@ -55,7 +41,26 @@ function Column({ id, title, description }: IColumn) {
     if (columnTasks.length === 0) {
       async function fetchTasks() {
         try {
-          const data = TaskData.filter((task) => task.columnId === id);
+          const csrfToken = await getCsrfToken();
+
+          const response = await fetch(
+            `http://localhost:8000/api/boards/${boardId}/columns/${id}/tasks/`,
+            {
+              method: 'GET',
+              credentials: 'include',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken,
+              },
+            },
+          );
+          const data = await response.json();
+
+          if (!response.ok) {
+            console.error('Failed to fetch tasks:', data);
+            return;
+          }
+
           dispatch(loadTasks({ columnId: id, tasks: data }));
         } catch (error) {
           console.error('Error fetching tasks:', error);
@@ -64,7 +69,7 @@ function Column({ id, title, description }: IColumn) {
 
       fetchTasks();
     }
-  }, [dispatch, id, columnTasks.length]);
+  }, [dispatch, boardId, id, columnTasks.length]);
 
   async function handleDeleteColumn() {
     const csrfToken = await getCsrfToken();
@@ -89,8 +94,12 @@ function Column({ id, title, description }: IColumn) {
     dispatch(deleteColumn({ boardId: boardId!, columnId: id }));
   }
 
+  async function openTaskForm() {
+    setSearchParams({ 'create-task': 'open', column: id });
+  }
+
   return (
-    <Card className="w-85" size="sm">
+    <Card className="w-85 self-start" size="sm">
       <CardHeader>
         <CardTitle>
           <span className="text-xl font-semibold">{title}</span>
@@ -122,7 +131,7 @@ function Column({ id, title, description }: IColumn) {
         ))}
       </CardContent>
       <CardFooter>
-        <Button className="w-full">
+        <Button className="w-full" onClick={openTaskForm}>
           <LucidePlus className="mr-2" />
           <span>Add Task</span>
         </Button>

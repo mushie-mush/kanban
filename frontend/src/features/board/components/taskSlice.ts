@@ -24,9 +24,17 @@ export const taskSlice = createSlice({
       const { columnId, tasks } = action.payload;
       state.tasksByColumnID[columnId] = tasks;
     },
+    deleteTask: (state, action) => {
+      const { columnId, taskId } = action.payload;
+      if (state.tasksByColumnID[columnId]) {
+        state.tasksByColumnID[columnId] = state.tasksByColumnID[
+          columnId
+        ].filter((task) => task.id !== taskId);
+      }
+    },
   },
 });
 
-export const { addTask, loadTasks } = taskSlice.actions;
+export const { addTask, loadTasks, deleteTask } = taskSlice.actions;
 
 export default taskSlice.reducer;

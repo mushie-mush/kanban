@@ -41,14 +41,14 @@ function AppLayout() {
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset>
-        <main className="p-4">
+        <main className="flex flex-col flex-1 p-4 max-w-full">
           <SidebarTrigger />
-          <div className="mt-4">
+          <div className="flex flex-1 mt-4 max-w-full">
             <Outlet />
           </div>
         </main>
+        <CreateBoardModal />
       </SidebarInset>
-      <CreateBoardModal />
     </SidebarProvider>
   );
 }

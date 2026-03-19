@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import Column from '@/features/board/components/Column';
 import { loadColumns } from '@/features/board/components/columnSlice';
 import CreateColumn from '@/features/board/components/CreateColumn';
+import TaskForm from '@/features/board/components/TaskForm';
 import { getCsrfToken } from '@/lib/csrf';
 import type { RootState } from '@/store';
 import { LucidePlus } from 'lucide-react';
@@ -65,8 +66,8 @@ function Board() {
   }
 
   return (
-    <div className="p-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+    <div className="p-6 flex flex-col flex-1 max-w-full">
+      <div className="flex flex-col mb-6">
         <div>
           <h1 className="text-3xl font-bold">{board?.name}</h1>
           <p className="text-muted-foreground mt-2">
@@ -75,16 +76,23 @@ function Board() {
         </div>
       </div>
 
-      <div className="flex gap-4 mt-8">
-        {boardColumns.map((column) => (
-          <Column key={column.id} {...column} />
-        ))}
-        <Button variant="outline" className="" onClick={openCreateColumnModal}>
-          <LucidePlus />
-        </Button>
+      <div className="flex flex-1 max-w-full overflow-x-auto border rounded-2xl p-4">
+        <div className="flex gap-4 flex-nowrap min-w-max">
+          {boardColumns.map((column) => (
+            <Column key={column.id} {...column} />
+          ))}
+          <Button
+            variant="outline"
+            className=""
+            onClick={openCreateColumnModal}
+          >
+            <LucidePlus />
+          </Button>
+        </div>
       </div>
 
       <CreateColumn />
+      <TaskForm />
     </div>
   );
 }
