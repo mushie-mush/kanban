@@ -34,6 +34,7 @@ function AppSidebar() {
   const navigate = useNavigate();
   const [, setSearchParams] = useSearchParams();
   const myBoards = useSelector((state: RootState) => state.boards.boards);
+  const user = useSelector((state: RootState) => state.auth.user);
 
   async function handleLogout() {
     const csrfToken = await getCsrfToken();
@@ -96,35 +97,39 @@ function AppSidebar() {
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>
-          <SidebarMenuItem>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <SidebarMenuButton size="lg">
-                  <Avatar className="h-8 w-8 rounded-lg">
-                    <AvatarFallback className="rounded-lg">JD</AvatarFallback>
-                  </Avatar>
-                  <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-medium">John Doe</span>
-                    <span className="truncate text-xs">
-                      john.doe@example.com
-                    </span>
-                  </div>
-                  <ChevronsUpDown className="ml-auto size-4" />
-                </SidebarMenuButton>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuGroup>
-                  <DropdownMenuItem
-                    variant="destructive"
-                    onClick={handleLogout}
-                  >
-                    <LogOutIcon />
-                    Logout
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </SidebarMenuItem>
+          {user && (
+            <SidebarMenuItem>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <SidebarMenuButton size="lg">
+                    <Avatar className="h-8 w-8 rounded-lg">
+                      <AvatarFallback className="rounded-lg">
+                        {user.username[0].toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="grid flex-1 text-left text-sm leading-tight">
+                      <span className="truncate font-medium">
+                        {user.username}
+                      </span>
+                      <span className="truncate text-xs">{user.email}</span>
+                    </div>
+                    <ChevronsUpDown className="ml-auto size-4" />
+                  </SidebarMenuButton>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuGroup>
+                    <DropdownMenuItem
+                      variant="destructive"
+                      onClick={handleLogout}
+                    >
+                      <LogOutIcon />
+                      Logout
+                    </DropdownMenuItem>
+                  </DropdownMenuGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </SidebarMenuItem>
+          )}
         </SidebarMenu>
       </SidebarFooter>
     </Sidebar>

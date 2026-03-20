@@ -76,7 +76,7 @@ function Board() {
         </div>
       </div>
 
-      <div className="flex flex-1 max-w-full overflow-x-auto border rounded-2xl p-4">
+      <div className="flex flex-1 max-w-full overflow-x-auto bg-stone-100 rounded-2xl p-4">
         <div className="flex gap-4 flex-nowrap min-w-max">
           {boardColumns.map((column) => (
             <Column key={column.id} {...column} />
