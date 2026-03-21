@@ -1,12 +1,22 @@
 export async function getCsrfToken(): Promise<string> {
-  await fetch('http://localhost:8000/api/csrf/', {
-    credentials: 'include',
-  });
+  let token = getCookie('csrftoken');
 
-  const token = document.cookie
-    .split('; ')
-    .find((row) => row.startsWith('csrftoken='))
-    ?.split('=')[1];
+  if (!token) {
+    await fetch('http://localhost:8000/api/csrf/', {
+      credentials: 'include',
+    });
+
+    token = getCookie('csrftoken');
+  }
 
   return token ?? '';
+}
+
+function getCookie(name: string): string | null {
+  const token = document.cookie
+    .split('; ')
+    .find((row) => row.startsWith(`${name}=`))
+    ?.split('=')[1];
+
+  return token || null;
 }
