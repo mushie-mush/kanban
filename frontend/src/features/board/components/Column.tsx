@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/card';
 import { EllipsisVertical, LucidePlus } from 'lucide-react';
 import Task from './Task';
-import type { IColumn } from '../board';
+import type { IColumn, ITask } from '../board';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,10 +27,12 @@ import { getCsrfToken } from '@/lib/csrf';
 import { useParams, useSearchParams } from 'react-router';
 import { deleteColumn } from './columnSlice';
 
+const EMPTY_TASKS: ITask[] = [];
+
 function Column({ id, title, description }: IColumn) {
   const { boardId } = useParams();
   const columnTasks = useSelector(
-    (state: RootState) => state.tasks.tasksByColumnID[id] || [],
+    (state: RootState) => state.tasks.tasksByColumnID[id] || EMPTY_TASKS,
   );
   const [, setSearchParams] = useSearchParams();
 

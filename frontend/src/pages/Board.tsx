@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import type { IColumn } from '@/features/board/board';
 import Column from '@/features/board/components/Column';
 import { loadColumns } from '@/features/board/components/columnSlice';
 import CreateColumn from '@/features/board/components/CreateColumn';
@@ -10,6 +11,8 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useSearchParams } from 'react-router';
 
+const EMPTY_COLUMNS: IColumn[] = [];
+
 function Board() {
   const { boardId } = useParams();
   const [, setSearchParams] = useSearchParams();
@@ -18,10 +21,10 @@ function Board() {
   const boards = useSelector((state: RootState) => state.boards.boards);
   const board = boards.find((board) => board.id == boardId);
 
-  const columnsByBoardID = useSelector(
-    (state: RootState) => state.columns.columnsByBoardID,
+  const boardColumns = useSelector(
+    (state: RootState) =>
+      state.columns.columnsByBoardID[boardId!] || EMPTY_COLUMNS,
   );
-  const boardColumns = columnsByBoardID[boardId!] || [];
 
   useEffect(() => {
     if (!board) return;
@@ -48,8 +51,6 @@ function Board() {
             console.error('Failed to fetch columns:', data);
             return;
           }
-
-          console.log('Fetched columns:', data);
 
           dispatch(loadColumns({ boardId, columns: data }));
         } catch (error) {
