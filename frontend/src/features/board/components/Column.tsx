@@ -29,10 +29,9 @@ import { deleteColumn } from './columnSlice';
 
 function Column({ id, title, description }: IColumn) {
   const { boardId } = useParams();
-  const tasks = useSelector(
+  const columnTasks = useSelector(
     (state: RootState) => state.tasks.tasksByColumnID[id] || [],
   );
-  const columnTasks = tasks.filter((task) => task.column === id);
   const [, setSearchParams] = useSearchParams();
 
   const dispatch = useDispatch();

@@ -43,7 +43,7 @@ function AppLayout() {
       <SidebarInset>
         <main className="flex flex-col flex-1 p-4 max-w-full">
           <SidebarTrigger />
-          <div className="flex flex-1 mt-4 max-w-full">
+          <div className="flex-1 mt-4 max-w-full">
             <Outlet />
           </div>
         </main>
