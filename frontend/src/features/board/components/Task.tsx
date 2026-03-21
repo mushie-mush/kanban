@@ -19,32 +19,38 @@ import { getCsrfToken } from '@/lib/csrf';
 import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router';
 import { deleteTask } from './taskSlice';
+import { toast } from 'sonner';
 
 function Task({ id, title, description, column }: ITask) {
   const dispatch = useDispatch();
   const { boardId } = useParams();
 
   async function handleDeleteTask() {
-    const csrfToken = await getCsrfToken();
+    try {
+      const csrfToken = await getCsrfToken();
 
-    const response = await fetch(
-      `http://localhost:8000/api/boards/${boardId}/columns/${column}/tasks/${id}/`,
-      {
-        method: 'DELETE',
-        credentials: 'include',
-        headers: {
-          'X-CSRFToken': csrfToken,
+      const response = await fetch(
+        `http://localhost:8000/api/boards/${boardId}/columns/${column}/tasks/${id}/`,
+        {
+          method: 'DELETE',
+          credentials: 'include',
+          headers: {
+            'X-CSRFToken': csrfToken,
+          },
         },
-      },
-    );
+      );
 
-    if (!response.ok) {
-      console.error('Failed to delete task');
+      if (!response.ok) {
+        toast.error('Failed to delete task');
+        return;
+      }
 
-      return;
+      dispatch(deleteTask({ columnId: column!, taskId: id }));
+      toast.success('Task deleted successfully');
+    } catch (error) {
+      console.error('Error deleting task:', error);
+      toast.error('Error deleting task');
     }
-
-    dispatch(deleteTask({ columnId: column!, taskId: id }));
   }
   return (
     <Card size="sm" className="rounded-sm">

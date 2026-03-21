@@ -15,6 +15,7 @@ import { addColumn } from './columnSlice';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { getCsrfToken } from '@/lib/csrf';
+import { toast } from 'sonner';
 
 function CreateColumn() {
   const [title, setTitle] = useState('');
@@ -54,7 +55,7 @@ function CreateColumn() {
     const data = await response.json();
 
     if (!response.ok) {
-      console.error('Failed to create column:', data);
+      toast.error(data.error || 'Failed to create column');
       return;
     }
 
@@ -65,6 +66,7 @@ function CreateColumn() {
       }),
     );
 
+    toast.success('Column created successfully');
     closeModal();
   }
 

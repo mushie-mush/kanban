@@ -26,6 +26,7 @@ import { loadTasks } from './taskSlice';
 import { getCsrfToken } from '@/lib/csrf';
 import { useParams, useSearchParams } from 'react-router';
 import { deleteColumn } from './columnSlice';
+import { toast } from 'sonner';
 
 const EMPTY_TASKS: ITask[] = [];
 
@@ -58,12 +59,14 @@ function Column({ id, title, description }: IColumn) {
           const data = await response.json();
 
           if (!response.ok) {
-            console.error('Failed to fetch tasks:', data);
+            toast.error('Failed to fetch tasks');
             return;
           }
 
           dispatch(loadTasks({ columnId: id, tasks: data }));
+          toast.success('Tasks loaded successfully');
         } catch (error) {
+          toast.error('Error fetching tasks');
           console.error('Error fetching tasks:', error);
         }
       }
@@ -73,26 +76,31 @@ function Column({ id, title, description }: IColumn) {
   }, [dispatch, boardId, id, columnTasks.length]);
 
   async function handleDeleteColumn() {
-    const csrfToken = await getCsrfToken();
+    try {
+      const csrfToken = await getCsrfToken();
 
-    const response = await fetch(
-      `http://localhost:8000/api/boards/${boardId}/columns/${id}/`,
-      {
-        method: 'DELETE',
-        credentials: 'include',
-        headers: {
-          'X-CSRFToken': csrfToken,
+      const response = await fetch(
+        `http://localhost:8000/api/boards/${boardId}/columns/${id}/`,
+        {
+          method: 'DELETE',
+          credentials: 'include',
+          headers: {
+            'X-CSRFToken': csrfToken,
+          },
         },
-      },
-    );
+      );
 
-    if (!response.ok) {
-      console.error('Failed to delete column');
+      if (!response.ok) {
+        toast.error('Failed to delete column');
+        return;
+      }
 
-      return;
+      dispatch(deleteColumn({ boardId: boardId!, columnId: id }));
+      toast.success('Column deleted successfully');
+    } catch (error) {
+      console.error('Error deleting column:', error);
+      toast.error('Error deleting column');
     }
-
-    dispatch(deleteColumn({ boardId: boardId!, columnId: id }));
   }
 
   async function openTaskForm() {

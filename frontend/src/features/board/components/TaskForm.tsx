@@ -15,6 +15,7 @@ import { useState } from 'react';
 import { useParams, useSearchParams } from 'react-router';
 import { addTask } from './taskSlice';
 import { useDispatch } from 'react-redux';
+import { toast } from 'sonner';
 
 function TaskForm() {
   const [title, setTitle] = useState('');
@@ -55,11 +56,8 @@ function TaskForm() {
     );
     const data = await response.json();
 
-    console.log('Create Task Response:', response);
-    console.log('Create Task Data:', data);
-
     if (!response.ok) {
-      console.error('Failed to create task:', data);
+      toast.error(data.error || 'Failed to create task');
       return;
     }
 
@@ -69,6 +67,7 @@ function TaskForm() {
         task: data,
       }),
     );
+    toast.success('Task created successfully');
 
     closeModal();
   }

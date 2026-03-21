@@ -6,6 +6,7 @@ import { useEffect } from 'react';
 import { getCsrfToken } from '@/lib/csrf';
 import { useDispatch } from 'react-redux';
 import { loadBoards } from '@/features/board/components/boardSlice';
+import { Toaster } from '@/components/ui/sonner';
 
 function AppLayout() {
   const dispatch = useDispatch();
@@ -38,18 +39,21 @@ function AppLayout() {
   }, [dispatch]);
 
   return (
-    <SidebarProvider>
-      <AppSidebar />
-      <SidebarInset>
-        <main className="flex flex-col flex-1 p-4 max-w-full">
-          <SidebarTrigger />
-          <div className="flex-1 mt-4 max-w-full">
-            <Outlet />
-          </div>
-        </main>
-        <CreateBoardModal />
-      </SidebarInset>
-    </SidebarProvider>
+    <>
+      <SidebarProvider>
+        <AppSidebar />
+        <SidebarInset>
+          <main className="flex flex-col flex-1 p-4 max-w-full">
+            <SidebarTrigger />
+            <div className="flex-1 mt-4 max-w-full">
+              <Outlet />
+            </div>
+          </main>
+          <CreateBoardModal />
+        </SidebarInset>
+      </SidebarProvider>
+      <Toaster position="top-right" />
+    </>
   );
 }
 export default AppLayout;

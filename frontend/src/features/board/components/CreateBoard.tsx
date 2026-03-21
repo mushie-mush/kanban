@@ -17,6 +17,7 @@ import { useSearchParams } from 'react-router';
 import { addBoard } from './boardSlice';
 import { getCsrfToken } from '@/lib/csrf';
 import { Textarea } from '@/components/ui/textarea';
+import { toast } from 'sonner';
 
 function CreateBoardModal() {
   const [name, setName] = useState('');
@@ -52,11 +53,13 @@ function CreateBoardModal() {
     const data = await response.json();
 
     if (!response.ok) {
-      console.error('Failed to create board:', data);
+      toast.error(data.error || 'Failed to create board');
       return;
     }
 
     dispatch(addBoard(data));
+    toast.success('Board created successfully');
+
     closeModal();
   }
 
