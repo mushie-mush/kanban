@@ -39,7 +39,7 @@ function LoginForm() {
     if (response.ok) {
       const data = await response.json();
 
-      dispatch(login(data));
+      dispatch(login(data.user));
       navigate('/app');
     } else {
       setError(true);

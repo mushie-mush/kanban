@@ -104,7 +104,7 @@ function AppSidebar() {
                   <SidebarMenuButton size="lg">
                     <Avatar className="h-8 w-8 rounded-lg">
                       <AvatarFallback className="rounded-lg">
-                        {user.username[0].toUpperCase()}
+                        {user.username?.[0].toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                     <div className="grid flex-1 text-left text-sm leading-tight">
