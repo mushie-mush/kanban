@@ -26,13 +26,13 @@ import {
 } from '../ui/sidebar';
 import { Avatar, AvatarFallback } from '../ui/avatar';
 import { getCsrfToken } from '@/lib/csrf';
-import { Link, useNavigate, useSearchParams } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import { useSelector } from 'react-redux';
 import type { RootState } from '@/store';
+import Modal from '../ui/Modal';
 
 function AppSidebar() {
   const navigate = useNavigate();
-  const [, setSearchParams] = useSearchParams();
   const myBoards = useSelector((state: RootState) => state.boards.boards);
   const user = useSelector((state: RootState) => state.auth.user);
 
@@ -50,10 +50,6 @@ function AppSidebar() {
     if (response.ok) {
       navigate('/login');
     }
-  }
-
-  function openCreateBoardModal() {
-    setSearchParams({ 'create-board': 'open' });
   }
 
   return (
@@ -89,9 +85,11 @@ function AppSidebar() {
                 </SidebarMenuItem>
               ))
             )}
-            <SidebarGroupAction onClick={openCreateBoardModal}>
-              <LucidePlus />
-            </SidebarGroupAction>
+            <Modal.Open window="create-board">
+              <SidebarGroupAction>
+                <LucidePlus />
+              </SidebarGroupAction>
+            </Modal.Open>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>

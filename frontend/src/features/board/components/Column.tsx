@@ -24,20 +24,24 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import { loadTasks } from './taskSlice';
 import { getCsrfToken } from '@/lib/csrf';
-import { useParams, useSearchParams } from 'react-router';
+import { useParams } from 'react-router';
 import { deleteColumn } from './columnSlice';
 import { toast } from 'sonner';
+import { useModal } from '@/components/ui/Modal';
 
 const EMPTY_TASKS: ITask[] = [];
 
-function Column({ id, title, description }: IColumn) {
+interface IColumnProps extends IColumn {
+  onCreateTask: () => void;
+}
+
+function Column({ id, title, description, onCreateTask }: IColumnProps) {
+  const dispatch = useDispatch();
+  const { openModal } = useModal();
   const { boardId } = useParams();
   const columnTasks = useSelector(
     (state: RootState) => state.tasks.tasksByColumnID[id] || EMPTY_TASKS,
   );
-  const [, setSearchParams] = useSearchParams();
-
-  const dispatch = useDispatch();
 
   useEffect(() => {
     if (columnTasks.length === 0) {
@@ -64,7 +68,6 @@ function Column({ id, title, description }: IColumn) {
           }
 
           dispatch(loadTasks({ columnId: id, tasks: data }));
-          toast.success('Tasks loaded successfully');
         } catch (error) {
           toast.error('Error fetching tasks');
           console.error('Error fetching tasks:', error);
@@ -104,7 +107,8 @@ function Column({ id, title, description }: IColumn) {
   }
 
   async function openTaskForm() {
-    setSearchParams({ 'create-task': 'open', column: id });
+    onCreateTask();
+    openModal('create-task');
   }
 
   return (

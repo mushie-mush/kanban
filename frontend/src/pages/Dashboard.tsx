@@ -1,17 +1,12 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader } from '@/components/ui/card';
+import Modal from '@/components/ui/Modal';
 import type { RootState } from '@/store';
 import { ArchiveX } from 'lucide-react';
 import { useSelector } from 'react-redux';
-import { useSearchParams } from 'react-router';
 
 function Dashboard() {
-  const [, setSearchParams] = useSearchParams();
   const boards = useSelector((state: RootState) => state.boards.boards);
-
-  function openCreateBoardModal() {
-    setSearchParams({ 'create-board': 'open' });
-  }
 
   return (
     <div className="p-6">
@@ -31,9 +26,9 @@ function Dashboard() {
             You don't have any boards yet. <br />
             Start by creating a new board to organize your tasks and projects.
           </p>
-          <Button className="mt-4" onClick={openCreateBoardModal}>
-            Create Board
-          </Button>
+          <Modal.Open window="create-board">
+            <Button className="mt-4">Create Board</Button>
+          </Modal.Open>
         </div>
       )}
 

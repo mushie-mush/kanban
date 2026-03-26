@@ -1,44 +1,22 @@
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Field, FieldGroup } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useState } from 'react';
+import { DialogDescription, DialogTitle } from '@/components/ui/dialog';
 import { useDispatch } from 'react-redux';
-import { useSearchParams } from 'react-router';
 import { addBoard } from './boardSlice';
 import { getCsrfToken } from '@/lib/csrf';
-import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
+import Modal, { useModal } from '@/components/ui/Modal';
+import BoardForm from './BoardForm';
 
-function CreateBoardModal() {
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [searchParams, setSearchParams] = useSearchParams();
+export interface ICreateBoardProps {
+  name: string;
+  description: string;
+}
+
+function CreateBoard() {
   const dispatch = useDispatch();
+  const { closeModal } = useModal();
 
-  const isOpen = searchParams.get('create-board') === 'open';
-
-  function closeModal() {
-    const newParams = new URLSearchParams(searchParams);
-    newParams.delete('create-board');
-    setSearchParams(newParams);
-
-    setName('');
-    setDescription('');
-  }
-
-  async function handleCreateBoard(e: React.FormEvent) {
-    e.preventDefault();
-
+  async function handleCreateBoard(payload: ICreateBoardProps) {
     const csrfToken = await getCsrfToken();
 
     const response = await fetch('http://localhost:8000/api/boards/', {
@@ -48,7 +26,7 @@ function CreateBoardModal() {
         'Content-Type': 'application/json',
         'X-CSRFToken': csrfToken,
       },
-      body: JSON.stringify({ name, description }),
+      body: JSON.stringify(payload),
     });
     const data = await response.json();
 
@@ -64,52 +42,23 @@ function CreateBoardModal() {
   }
 
   return (
-    <Dialog open={isOpen}>
-      <DialogContent showCloseButton={false}>
-        <form onSubmit={handleCreateBoard} className="flex flex-col gap-6">
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-bold">
-              Create Board
-            </DialogTitle>
-            <DialogDescription>
-              Fill in the details to create a new board.
-            </DialogDescription>
-          </DialogHeader>
-          <FieldGroup>
-            <Field>
-              <Label htmlFor="board-name">Name</Label>
-              <Input
-                id="board-name"
-                name="board-name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-            </Field>
-          </FieldGroup>
-          <FieldGroup>
-            <Field>
-              <Label htmlFor="board-description">Description</Label>
-              <Textarea
-                id="board-description"
-                name="board-description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-              />
-            </Field>
-          </FieldGroup>
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button variant="outline" onClick={closeModal}>
-                Cancel
-              </Button>
-            </DialogClose>
-            <DialogClose asChild>
-              <Button type="submit">Create</Button>
-            </DialogClose>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+    <Modal.Window name="create-board">
+      <Modal.WindowHeader>
+        <DialogTitle className="text-2xl font-bold">Create Board</DialogTitle>
+        <DialogDescription>
+          Fill in the details to create a new board.
+        </DialogDescription>
+      </Modal.WindowHeader>
+      <BoardForm formId="create-board" onSubmit={handleCreateBoard} />
+      <Modal.WindowFooter>
+        <Button variant="outline" onClick={() => closeModal()}>
+          Cancel
+        </Button>
+        <Button type="submit" form="create-board">
+          Create
+        </Button>
+      </Modal.WindowFooter>
+    </Modal.Window>
   );
 }
-export default CreateBoardModal;
+export default CreateBoard;

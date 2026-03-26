@@ -1,25 +1,29 @@
 import { Button } from '@/components/ui/button';
+import Modal from '@/components/ui/Modal';
 import type { IColumn } from '@/features/board/board';
 import Column from '@/features/board/components/Column';
 import { loadColumns } from '@/features/board/components/columnSlice';
 import CreateColumn from '@/features/board/components/CreateColumn';
-import TaskForm from '@/features/board/components/TaskForm';
+import CreateTask from '@/features/board/components/CreateTask';
 import { getCsrfToken } from '@/lib/csrf';
 import type { RootState } from '@/store';
 import { LucidePlus } from 'lucide-react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useParams, useSearchParams } from 'react-router';
+import { useParams } from 'react-router';
 
 const EMPTY_COLUMNS: IColumn[] = [];
 
 function Board() {
+  const [creatingTaskColumnId, setCreatingTaskColumnId] = useState<
+    string | null
+  >(null);
   const { boardId } = useParams();
-  const [, setSearchParams] = useSearchParams();
   const dispatch = useDispatch();
 
-  const boards = useSelector((state: RootState) => state.boards.boards);
-  const board = boards.find((board) => board.id == boardId);
+  const board = useSelector((state: RootState) =>
+    state.boards.boards.find((board) => board.id == boardId),
+  );
 
   const boardColumns = useSelector(
     (state: RootState) =>
@@ -62,8 +66,8 @@ function Board() {
     }
   }, [boardId, board, boardColumns.length, dispatch]);
 
-  function openCreateColumnModal() {
-    setSearchParams({ 'create-column': 'open' });
+  function requestTaskCreation(columnId: string) {
+    setCreatingTaskColumnId(columnId);
   }
 
   return (
@@ -80,20 +84,22 @@ function Board() {
       <div className="flex-1 max-w-full overflow-x-auto bg-stone-100 rounded-2xl p-4">
         <div className="flex gap-4 flex-nowrap min-w-max">
           {boardColumns.map((column) => (
-            <Column key={column.id} {...column} />
+            <Column
+              key={column.id}
+              {...column}
+              onCreateTask={() => requestTaskCreation(column.id)}
+            />
           ))}
-          <Button
-            variant="outline"
-            className=""
-            onClick={openCreateColumnModal}
-          >
-            <LucidePlus />
-          </Button>
+          <Modal.Open window="create-column">
+            <Button variant="outline">
+              <LucidePlus />
+            </Button>
+          </Modal.Open>
         </div>
       </div>
 
       <CreateColumn />
-      <TaskForm />
+      <CreateTask columnId={creatingTaskColumnId} />
     </div>
   );
 }
