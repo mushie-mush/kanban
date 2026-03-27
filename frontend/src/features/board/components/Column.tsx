@@ -28,6 +28,7 @@ import { useParams } from 'react-router';
 import { deleteColumn } from './columnSlice';
 import { toast } from 'sonner';
 import { useModal } from '@/components/ui/Modal';
+import { useConfirm } from '@/components/ui/Confirm';
 
 const EMPTY_TASKS: ITask[] = [];
 
@@ -38,6 +39,7 @@ interface IColumnProps extends IColumn {
 function Column({ id, title, description, onCreateTask }: IColumnProps) {
   const dispatch = useDispatch();
   const { openModal } = useModal();
+  const { openDialog } = useConfirm();
   const { boardId } = useParams();
   const columnTasks = useSelector(
     (state: RootState) => state.tasks.tasksByColumnID[id] || EMPTY_TASKS,
@@ -78,32 +80,51 @@ function Column({ id, title, description, onCreateTask }: IColumnProps) {
     }
   }, [dispatch, boardId, id, columnTasks.length]);
 
-  async function handleDeleteColumn() {
-    try {
-      const csrfToken = await getCsrfToken();
+  function handleDeleteColumn() {
+    const callbackFn = async () => {
+      try {
+        const csrfToken = await getCsrfToken();
 
-      const response = await fetch(
-        `http://localhost:8000/api/boards/${boardId}/columns/${id}/`,
-        {
-          method: 'DELETE',
-          credentials: 'include',
-          headers: {
-            'X-CSRFToken': csrfToken,
+        const response = await fetch(
+          `http://localhost:8000/api/boards/${boardId}/columns/${id}/`,
+          {
+            method: 'DELETE',
+            credentials: 'include',
+            headers: {
+              'X-CSRFToken': csrfToken,
+            },
           },
-        },
-      );
+        );
 
-      if (!response.ok) {
-        toast.error('Failed to delete column');
-        return;
+        if (!response.ok) {
+          toast.error('Failed to delete column');
+          return;
+        }
+
+        dispatch(deleteColumn({ boardId: boardId!, columnId: id }));
+        toast.success('Column deleted successfully');
+      } catch (error) {
+        console.error('Error deleting column:', error);
+        toast.error('Error deleting column');
       }
+    };
 
-      dispatch(deleteColumn({ boardId: boardId!, columnId: id }));
-      toast.success('Column deleted successfully');
-    } catch (error) {
-      console.error('Error deleting column:', error);
-      toast.error('Error deleting column');
-    }
+    openDialog({
+      title: 'Delete Column',
+      description: 'Are you sure you want to delete this column?',
+      buttons: [
+        {
+          label: 'Cancel',
+          type: 'secondary',
+          onClick: () => {},
+        },
+        {
+          label: 'Delete',
+          type: 'destructive',
+          onClick: callbackFn,
+        },
+      ],
+    });
   }
 
   async function openTaskForm() {

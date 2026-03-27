@@ -20,37 +20,58 @@ import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router';
 import { deleteTask } from './taskSlice';
 import { toast } from 'sonner';
+import { useConfirm } from '@/components/ui/Confirm';
 
 function Task({ id, title, description, column }: ITask) {
   const dispatch = useDispatch();
+  const { openDialog } = useConfirm();
   const { boardId } = useParams();
 
   async function handleDeleteTask() {
-    try {
-      const csrfToken = await getCsrfToken();
+    const callbackFn = async () => {
+      try {
+        const csrfToken = await getCsrfToken();
 
-      const response = await fetch(
-        `http://localhost:8000/api/boards/${boardId}/columns/${column}/tasks/${id}/`,
-        {
-          method: 'DELETE',
-          credentials: 'include',
-          headers: {
-            'X-CSRFToken': csrfToken,
+        const response = await fetch(
+          `http://localhost:8000/api/boards/${boardId}/columns/${column}/tasks/${id}/`,
+          {
+            method: 'DELETE',
+            credentials: 'include',
+            headers: {
+              'X-CSRFToken': csrfToken,
+            },
           },
-        },
-      );
+        );
 
-      if (!response.ok) {
-        toast.error('Failed to delete task');
-        return;
+        if (!response.ok) {
+          toast.error('Failed to delete task');
+          return;
+        }
+
+        dispatch(deleteTask({ columnId: column!, taskId: id }));
+        toast.success('Task deleted successfully');
+      } catch (error) {
+        console.error('Error deleting task:', error);
+        toast.error('Error deleting task');
       }
+    };
 
-      dispatch(deleteTask({ columnId: column!, taskId: id }));
-      toast.success('Task deleted successfully');
-    } catch (error) {
-      console.error('Error deleting task:', error);
-      toast.error('Error deleting task');
-    }
+    openDialog({
+      title: 'Delete Task',
+      description: 'Are you sure you want to delete this task?',
+      buttons: [
+        {
+          label: 'Cancel',
+          type: 'secondary',
+          onClick: () => {},
+        },
+        {
+          label: 'Delete',
+          type: 'destructive',
+          onClick: callbackFn,
+        },
+      ],
+    });
   }
   return (
     <Card size="sm" className="rounded-sm">
